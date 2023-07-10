@@ -1,17 +1,16 @@
 
 import requests
 from selectorlib import Extractor
+from string import capwords as capwords
 
 
 class Location:
     '''Location expressed by city and country names.  Limitation of timeanddate.com -
     the site expects manual resolution of ambiguous city names, so just live without
     resolving that (e.g., Albany GA vs Albany NY
-    Then use web scraping to reture the current temp there using get_temperature()'''
+    Then use web scraping to return the current temp there using get_temperature()'''
     # Fixed problem of http.client not found during import of requests
     # by renaming class Locale to Location.  Weird!
-
-    #
 
     WEATHER_BASE_URL = "https://www.timeanddate.com/weather/"
     REQUEST_HEADERS = {
@@ -34,8 +33,12 @@ class Location:
             raise ValueError("Both city and country have to be supplied")
         self.city: str = city.strip().lower().replace(" ", "-")
         self.country: str = country.strip().lower().replace(" ", "-")
+        self.country_pretty:str = country.strip()
+        self.country_pretty = capwords(self.country_pretty, sep=" ")
+        self.city_pretty: str = city.strip()
+        self.city_pretty = capwords(self.city_pretty, sep=" ")
 
-    def get_temperature(self, want_metric: bool):
+    def get_temperature(self, want_metric: bool) -> float:
         '''get current temp for location, either deg F or deg C as determined by want_metric
         flag bad HTTP response by adding 1000 to the response code'''
         url = f"{Location.WEATHER_BASE_URL}/{self.country}/{self.city}"
@@ -56,32 +59,12 @@ class Location:
 
 
 # test
-
-location = Location(city="New City", country="USA")
-print(location.country)
-print(location.city)
-print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
-print()
-location = Location(country="south korea", city="Seoul")
-print(location.country)
-print(location.city)
-print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
-print()
-# usa is the correct country name
-location = Location(city="New City", country="US")
-print(location.country)
-print(location.city)
-print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
-print()
-# uk is the correct country name
-location = Location(city="Glasgow", country="scotland")
-print(location.country)
-print(location.city)
-print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
-print()
-# uk is the correct country name
-location = Location(city="Glasgow", country="uk")
-print(location.country)
-print(location.city)
-print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
-print()
+if __name__ == "__main__":
+    locations = [["New City", "USA"], ["Seoul", "south korea"], ["New City", "US"], \
+        ["Glasgow", "scotland"], ["Glasgow", "uk"]]
+    for loc in locations:
+        location = Location(city=loc[0], country=loc[1])
+        print(f"{location.country} -- {location.country_pretty}")
+        print(f"{location.city} -- {location.city_pretty}")
+        print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
+        print()
