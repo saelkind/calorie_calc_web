@@ -1,4 +1,3 @@
-
 import requests
 from selectorlib import Extractor
 from string import capwords as capwords
@@ -13,6 +12,7 @@ class Location:
     # by renaming class Locale to Location.  Weird!
 
     WEATHER_BASE_URL = "https://www.timeanddate.com/weather/"
+    # headers provided by ardit cluice
     REQUEST_HEADERS = {
         'pragma': 'no-cache',
         'cache-control': 'no-cache',
@@ -26,6 +26,10 @@ class Location:
     NBSP = '\xa0'
     DEG_F = "°F"
     DEG_C = "°C"
+    METRIC_KEY = "metric"
+    ENGLISH_KEY = "English"
+    STATUS_KEY = "status"
+    GOOD_DATA_KEY = "good data"
 
     def __init__(self, city: str = None, country: str = None):
         if (city is None or city.strip() == "") or \
@@ -38,14 +42,19 @@ class Location:
         self.city_pretty: str = city.strip()
         self.city_pretty = capwords(self.city_pretty, sep=" ")
 
-    def get_temperature(self, want_metric: bool) -> float:
-        '''get current temp for location, either deg F or deg C as determined by want_metric
+    def get_temperature(self) -> dict:
+        '''get current temp for location by scraping the timeanddate.com web site,
+        returning a dict with both deg F and deg C as determined by want_metric
         flag bad HTTP response by adding 1000 to the response code'''
         url = f"{Location.WEATHER_BASE_URL}/{self.country}/{self.city}"
         response = requests.get(url, headers=Location.REQUEST_HEADERS, timeout=10)
         if response.status_code != 200:
             # print(f"got bad http response status code {response.status_code}")
-            return response.status_code + 1000
+            bad_return_temp = response.status_code + 1000
+            return {Location.METRIC_KEY: bad_return_temp,
+                    Location.ENGLISH_KEY: bad_return_temp,
+                    Location.STATUS_KEY: response.status_code,
+                    Location.GOOD_DATA_KEY: False}
         extractor = Extractor.from_yaml_file("temperature.yaml")
         temp_dict = extractor.extract(response.text)
         temp_str = temp_dict['temp']
@@ -55,7 +64,10 @@ class Location:
         else:
             self.temp_C = float(temp_str.replace(f'{Location.NBSP}°C', ''))
             self.temp_F = (self.temp_C * 9.0 / 5.0) + 32
-        return self.temp_C if want_metric else self.temp_F
+        return {Location.METRIC_KEY: self.temp_C,
+                Location.ENGLISH_KEY: self.temp_F,
+                Location.STATUS_KEY: response.status_code,
+                Location.GOOD_DATA_KEY: True}
 
 
 # test
@@ -66,5 +78,9 @@ if __name__ == "__main__":
         location = Location(city=loc[0], country=loc[1])
         print(f"{location.country} -- {location.country_pretty}")
         print(f"{location.city} -- {location.city_pretty}")
-        print(f"Temp: {location.get_temperature(False):.2f}{Location.DEG_F} or {location.get_temperature(True):.2f}{Location.DEG_C}")
+        temp_resp: dict = location.get_temperature()
+        print(f"Temp: {temp_resp.get(Location.ENGLISH_KEY):.2f}{Location.DEG_F} or " +
+            f"{temp_resp.get(Location.METRIC_KEY):.2f}{Location.DEG_C}")
+        print("HTTP response status:", temp_resp.get(Location.STATUS_KEY),
+              ", Good data:", temp_resp.get(Location.GOOD_DATA_KEY))
         print()
