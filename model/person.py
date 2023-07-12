@@ -11,7 +11,8 @@ class Person:
 
     def __init__(self, age: float, weight: float, used_metric: bool = False):
         if (age is None or age <= 0) or (weight is None or weight <= 0):
-            raise ValueError("Both age and height must be supplies and > 0")
+            print(age, weight, used_metric)
+            raise ValueError("Both age and height must be supplied and > 0")
         self.age: float = age
         self.used_metric = used_metric
         if not used_metric:
@@ -23,16 +24,17 @@ class Person:
         self.height: Height = None
         self.location: Location = None
 
-    def calc_calories_needed(self, temperature: float) -> float:
+    def calc_calories_needed(self: float) -> float:
         if self.height is None:
             raise ValueError("Missing person's height")
         if self.location is None:
             raise ValueError("Missing person's location")
         # this formula is done with metric measurements
-        if self.location.get_temperature(True) >= 1000:
-            raise ValueError("Had unfindable location, no temperature available")
-        return 10 * self.weight_kg + 6.5 * self.height.centimeters \
-                + 5 - self.location.get_temperature(True)
+        temp_list = self.location.get_temperature()
+        if not temp_list[1]:
+            raise ValueError("Location could not be found, please try another one or a different spelling")
+        return int(10 * self.weight_kg + 6.5 * self.height.centimeters
+                          + 5 - temp_list[0])
 
 
 
@@ -50,7 +52,7 @@ if __name__ == "__main__":
         print(f"{here.city_pretty}, {here.country_pretty}:")
         print(f"\t{here.get_temperature(True):.1f}{Location.DEG_C}, or {here.get_temperature(False):.1f}{Location.DEG_F}")
         try:
-            print(f"Calories needed: {me.calc_calories_needed(here.get_temperature(want_metric=True)):.1f}")
+            print(f"Calories needed: {me.calc_calories_needed():.1f}")
         except ValueError as ve:
             print(ve)
         print()

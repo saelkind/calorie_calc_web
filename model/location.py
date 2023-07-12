@@ -27,7 +27,9 @@ class Location:
     DEG_F = "°F"
     DEG_C = "°C"
     METRIC_KEY = "metric"
+    METRIC_STR_KEY = "metric_str"
     ENGLISH_KEY = "English"
+    ENGLISH_STR_KEY = "English_str"
     STATUS_KEY = "status"
     GOOD_DATA_KEY = "good data"
 
@@ -42,7 +44,7 @@ class Location:
         self.city_pretty: str = city.strip()
         self.city_pretty = capwords(self.city_pretty, sep=" ")
 
-    def get_temperature(self) -> dict:
+    def get_temperature(self) -> tuple:
         '''get current temp for location by scraping the timeanddate.com web site,
         returning a dict with both deg F and deg C as determined by want_metric
         flag bad HTTP response by adding 1000 to the response code'''
@@ -51,11 +53,16 @@ class Location:
         if response.status_code != 200:
             # print(f"got bad http response status code {response.status_code}")
             bad_return_temp = response.status_code + 1000
-            return {Location.METRIC_KEY: bad_return_temp,
-                    Location.ENGLISH_KEY: bad_return_temp,
-                    Location.STATUS_KEY: response.status_code,
-                    Location.GOOD_DATA_KEY: False}
-        extractor = Extractor.from_yaml_file("temperature.yaml")
+            self.temp_data = {
+                Location.METRIC_KEY: bad_return_temp,
+                Location.METRIC_STR_KEY: f"{bad_return_temp}&nbsp;{Location.DEG_C}",
+                Location.ENGLISH_KEY: bad_return_temp,
+                Location.ENGLISH_STR_KEY: f"{bad_return_temp}&nbsp;{Location.DEG_F}",
+                Location.STATUS_KEY: response.status_code,
+                Location.GOOD_DATA_KEY: False
+            }
+            return bad_return_temp, False
+        extractor = Extractor.from_yaml_file("model/temperature.yaml")
         temp_dict = extractor.extract(response.text)
         temp_str = temp_dict['temp']
         if Location.DEG_F in temp_str:
@@ -64,10 +71,25 @@ class Location:
         else:
             self.temp_C = float(temp_str.replace(f'{Location.NBSP}°C', ''))
             self.temp_F = (self.temp_C * 9.0 / 5.0) + 32
-        return {Location.METRIC_KEY: self.temp_C,
+        self.temp_data = {
+                Location.METRIC_KEY: self.temp_C,
+                Location.METRIC_STR_KEY: f"{self.temp_C:.1f} {Location.DEG_C}",
                 Location.ENGLISH_KEY: self.temp_F,
+                Location.ENGLISH_STR_KEY: f"{self.temp_F:.1f} {Location.DEG_F}",
                 Location.STATUS_KEY: response.status_code,
-                Location.GOOD_DATA_KEY: True}
+                Location.GOOD_DATA_KEY: True
+            }
+        return self.temp_C, True
+
+# TODO add current weather text and image from the same page as the temperature
+# /html/body/div[5]/main/article/section[1]/div[1]/div[2]/img     graphic showing current weather.
+#
+# /html/body/div[5]/main/article/section[1]/div[1]/p[1]  text desc of current weather (it's an sbsolute URL, e.g.,
+#
+# <img id="cur-weather" class="" title="" src="//c.tadst.com/gfx/w/svg/wt-6.svg" width="80" height="80">
+#
+# http://c.tadst.com/gfx/w/svg/wt-6.svg
+
 
 
 # test
@@ -78,9 +100,10 @@ if __name__ == "__main__":
         location = Location(city=loc[0], country=loc[1])
         print(f"{location.country} -- {location.country_pretty}")
         print(f"{location.city} -- {location.city_pretty}")
-        temp_resp: dict = location.get_temperature()
-        print(f"Temp: {temp_resp.get(Location.ENGLISH_KEY):.2f}{Location.DEG_F} or " +
-            f"{temp_resp.get(Location.METRIC_KEY):.2f}{Location.DEG_C}")
-        print("HTTP response status:", temp_resp.get(Location.STATUS_KEY),
-              ", Good data:", temp_resp.get(Location.GOOD_DATA_KEY))
+        temp_resp: tuple = location.get_temperature()
+        temp_data: dict = location.temp_data
+        print(f"Temp: {temp_data[Location.ENGLISH_STR_KEY]} or " +
+            f"{temp_data[Location.METRIC_STR_KEY]}")
+        print("HTTP response status:", temp_data[Location.STATUS_KEY],
+              ", Good data:", temp_data[Location.GOOD_DATA_KEY])
         print()

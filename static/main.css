@@ -1,0 +1,132 @@
+
+* {
+    font-family: sans-serif;
+}
+
+body {
+    background-color: lightgrey;
+}
+
+.input_full_col {
+    width: 90%;
+    margin-right: auto;
+    margin-left: autopx
+}
+
+table {
+    border: 2px solid #dddddd;
+    border-collapse: collapse;
+    background: lightblue;
+    width: 40%;
+    horizontal-align: middle;
+    text-align: left;
+    margin-left:20px
+}
+
+.invisible-table {
+    border: none;
+    border-collapse: collapse;
+    width: 20%;
+    horizontal-align: middle;
+    text-align: left;
+}
+
+
+td, th {
+    text-align: left;
+    padding: 10px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.center-grey {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.td-lightgrey {
+    text-align: left;
+    padding: 10px;
+    background-color: lightgrey;
+    border: none;
+}
+
+.background-img{
+    position:fixed;
+    left:10px;
+    bottom: 10px;
+    background-color: transparent;
+}
+
+.p-bottom-right{
+    position:fixed;
+    right:10px;
+    bottom: 10px;
+}
+
+h2 {
+    color: navy;
+    text-align: left;
+    margin-left: 20px
+}
+
+h1 {
+    text-align: left;
+    margin-left: 20px;
+    color: navy;}
+
+h1 {
+    text-align: left;
+    margin-left: 20px;
+    color: navy;}
+
+
+.p-center {
+    text-align:center;
+    width:60%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.btn-green {
+  display: inline-block;
+  padding: 12px 24px;
+  background: lightgreen;
+  font-weight: bold;
+  color: black;
+  width: 200px;
+  border: none;
+  outline: 4px solid darkgray;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: ease .3s;
+  text-align: center;
+  margin-left:20px;
+}
+
+.btn-red {
+  display: inline-block;
+  padding: 12px 24px;
+  background: tomato;
+  font-weight: bold;
+  color: black;
+  border: none;
+  width: 200px;
+  outline: 4px solid darkgray;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: ease .3s;
+  text-align: center;
+}
+
+p {
+    margin-left: 20px;
+    color: black;
+}
+
+}

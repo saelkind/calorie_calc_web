@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Calorie Calculation</title>
+    <link rel="stylesheet" type="text/css" href="static/main.css"/>
+</head>
+<body>
+<h1>Welcome to the Daily Calorie Calculation App</h1>
+
+<form action="/calories" method="get">
+    <h3 align = "left">{{unitsform.units_selection.label}}</h3>
+    <table align="left", cols="2" class="invisible-table">
+        {% for subfield in unitsform.units_selection %}
+            <tr>
+                <td width="5%">{{ subfield }}</td>
+                <td>{{ subfield.label }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br/><br/><br/>
+    <p style="text-align: left; width=25%; margin-top:80px;">
+        &nbsp;&nbsp;
+        {{unitsform.button(class="btn-green")}}
+    </p>
+</body>
+</html>

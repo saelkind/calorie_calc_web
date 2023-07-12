@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>How Many Calories Do I Need Today?</title>
+    <link rel="stylesheet" type="text/css" href="static/main.css"/>
+
+</head>
+<body>
+<h1>Calculation Page</h1>
+<p>Please enter the data below, then click on the button</p>
+<form action="/calories" method="post">
+    <table cols="2" style="width:30%;">
+        {% if ismetric %}
+        <tr>
+            <td width = "10%">{{ calform.height_centimeters.label }}</td>
+            <td>{{ calform.height_centimeters(class="input_full_col") }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td width="10%">{{ calform.height_feet.label }}</td>
+            <td>{{ calform.height_feet(class="input_full_col") }}</td>
+        </tr>
+       <tr>
+            <td>{{ calform.height_inches.label }}</td>
+            <td>{{ calform.height_inches(class="input_full_col") }}</td>
+        </tr>
+        {% endif %}
+
+       <tr>
+            <td>{{ calform.age.label }}</td>
+            <td>{{ calform.age(class="input_full_col") }}</td>
+        </tr>
+
+        {% if ismetric %}
+        <tr>
+            <td>{{ calform.weight_kg.label }}</td>
+            <td>{{ calform.weight_kg(class="input_full_col") }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>{{ calform.weight_pounds.label }}</td>
+            <td>{{ calform.weight_pounds(class="input_full_col") }}</td>
+        </tr>
+        {% endif %}
+       <tr>
+            <td>{{ calform.city.label }}</td>
+            <td>{{ calform.city(class="input_full_col") }}</td>
+        </tr>
+       <tr>
+            <td>{{ calform.country.label }}</td>
+            <td>{{ calform.country(class="input_full_col") }}</td>
+        </tr>
+     </table>
+    <p style="text-align: left; width=25%;">&nbsp;
+        {{calform.button(class="btn-green")}}
+    </p>
+    {% if results %}
+        <h2 >Results</h2>
+
+        <p>{{ resultsstr }}</p>
+    {% endif %}
+</body>
+</html>

@@ -1,2 +1,4 @@
 requests >= 2.31
 selectorlib >= 0.16
+flask >= 2.3.2
+wtforms
